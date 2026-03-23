@@ -10,7 +10,7 @@ jobs:
     defaults:
       run:
         working-directory: 1-DevOps/idempotweet
-    runs-on: ${{ vars.RUNNER || 'self-hosted' }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
