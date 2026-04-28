@@ -24,8 +24,6 @@ jobs:
         run: yarn install --immutable
       - name: Run Tests
         run: yarn test
-      - name: Generate Test Coverage
-        run: yarn test:coverage
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
         with:
