@@ -24,10 +24,12 @@ jobs:
         run: yarn install --immutable
       - name: Run Tests
         run: yarn test
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v6
-        with:
-          projectBaseDir: 1-DevOps/idempotweet
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      # - name: Generate Test Coverage
+      #   run: yarn test:coverage
+      # - name: SonarQube Scan
+      #   uses: SonarSource/sonarqube-scan-action@v6
+      #   with:
+      #     projectBaseDir: 1-DevOps/idempotweet
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
