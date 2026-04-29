@@ -55,3 +55,12 @@ next-env.d.ts
 # Ignore all local history of files
 .history
 .ionide
+
+target/
+/target
+.idea/
+.idea
+*.iml
+out/
+bin/
+obj/
