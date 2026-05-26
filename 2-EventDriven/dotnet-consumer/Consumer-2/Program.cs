@@ -22,8 +22,8 @@ Console.WriteLine("Connected to RabbitMQ");
 
 // Create a channel and declare the queue
 await using var channel = await connection.CreateChannelAsync();
-await channel.QueueDeclareAsync(queue: "chat_walid", durable: true, exclusive: false, autoDelete: false, arguments: null);
-await channel.QueueBindAsync(queue: "chat_walid", exchange: "chat", routingKey: "idem-fanout");
+await channel.QueueDeclareAsync(queue: "idem-events2", durable: true, exclusive: false, autoDelete: true, arguments: null);
+await channel.QueueBindAsync(queue: "idem-events2", exchange: "idem-direct", routingKey: "1");
 
 // Set up a consumer to listen for messages
 var consumer = new AsyncEventingBasicConsumer(channel);
@@ -43,5 +43,5 @@ consumer.ReceivedAsync += async (sender, eventArgs) =>
     await channel.BasicAckAsync(eventArgs.DeliveryTag, multiple: false);   
 };
 // Start consuming messages
-await channel.BasicConsumeAsync(queue: "chat_walid", autoAck: false, consumerTag: "", noLocal: false, exclusive: false, arguments: null, consumer: consumer);
+await channel.BasicConsumeAsync(queue: "idem-events2", autoAck: false, consumerTag: "", noLocal: false, exclusive: false, arguments: null, consumer: consumer);
 Console.ReadLine(); // Keep the application running to listen for messages
