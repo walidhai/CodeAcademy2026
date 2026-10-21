@@ -97,17 +97,20 @@ export async function subscribeToOrders(
   //                       da det startet, men assertExchange er idempotent, så det
   //                       spiller ingen rolle hvem som er først.
   //
+  await channel.assertExchange(RABBITMQ_EXCHANGE, "topic", { durable: true });
   //   2. assertQueue      Tomt kønavn, så finner broker på et selv. Du vil ha
   //                       { exclusive: true, autoDelete: true }: køen er din alene
   //                       og forsvinner når du kobler fra. Alle som ser på skjermen
   //                       skal få alle hendelsene, så dette er en kringkasting, ikke
   //                       en arbeidskø.
   //
+  const queue = await channel.assertQueue("orders", { exclusive: true, autoDelete: true });
   //   3. bindQueue        Bind køen din til exchangen med en routing key som fanger
   //                       "order.created" og "order.status-changed". `order.*`
   //                       matcher ett ledd, `order.#` matcher null eller flere.
   //                       Punktum skiller leddene i AMQP, ikke bindestrek.
   //
+  await channel.bindQueue(queue.queue, RABBITMQ_EXCHANGE, "order.#");
   //   4. consume          Meldingen kan være null, så sjekk den først. Innholdet er
   //                       JSON i `message.content`, og skal tolkes og sendes videre
   //                       til `onEvent`. Bruk { noAck: true }: et UI som mister en
@@ -116,6 +119,19 @@ export async function subscribeToOrders(
   //                       Ta vare på `consumerTag` fra svaret, så opprydningen
   //                       nedenfor kan avslutte abonnementet.
   //
+
+  const consumer = await channel.consume(
+    queue.queue,
+    (message) => {
+      if (!message) return;
+      try {
+        onEvent(JSON.parse(message.content.toString()) as KaffebarEvent);
+      } catch (error) {
+        console.error("Klarte ikke å tolke hendelse fra RabbitMQ:", error);
+      }
+    },
+    { noAck: true },
+  );
   // Står du fast: `rabbitmq-solution.ts` i samme mappe.
   // ---------------------------------------------------------------------------
   // Vakten under holder kompilatoren i ro, og sier samtidig fra så lenge oppgaven
